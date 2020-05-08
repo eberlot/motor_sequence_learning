@@ -2,7 +2,7 @@ function varargout = msl_imana(what,varargin)
 %function varargout = msl_imana(what,varargin)
 % function motor sequence learning (msl) analysing imaging data
 % ------------------------- General info ----------------------------------
-baseDir ='/Users/eberlot/Documents/MATLAB/Projects/MotorSequenceLearning/data';
+baseDir ='/Users/eberlot/Documents/MATLAB/Projects/motor_sequence_learning/data';
 surfDir = [baseDir '/surf'];
 regname_Brodmann    = {'S1','M1','PMd','SPLa'};
 regname_BG          = {'CaudateN','Putamen'};
@@ -238,7 +238,7 @@ switch what
             end
             B = cell(length(sessN),1);
             for ss=1:numel(sessN)
-                B{ss}=load(fullfile(betaDir,'group',sprintf('betas_%s_sess%d.mat',parcelType,sessN(ss)))); % beta directory
+                B{ss}=load(fullfile(baseDir,'group',sprintf('betas_%s_sess%d.mat',parcelType,sessN(ss)))); % beta directory
             end
             for r = reg
                 for st=1:2 % per seqType
@@ -247,6 +247,7 @@ switch what
                     partVec = condVec; Data = condVec; % initialise
                     for p=1:length(sn)
                         for ss = 1:numel(sessN)
+                            t = getrow(B{ss},B{ss}.SN==sn(p) & B{ss}.region==r);
                             beta = t.betaW{:}; % multivariately prewhitened betas
                             indx = seqIdx==st;
                             if ss == 1
@@ -544,7 +545,7 @@ switch what
                     So.Sig      = rsa_vectorizeIPM(Sig);
                     So.IPMfull  = rsa_vectorizeIPMfull(G);
                     % squared distances
-                    So.RDM      = rsa.distanceLDC(betaW(1:size(partV,1),:),partV,condV);
+                    RDM = rsa.distanceLDC(betaW(1:size(partV,1),:),partV,condV);
                     RDM = rsa_squareRDM(RDM);
                     So.dist_trained = nanmean(rsa_vectorizeRDM(RDM(1:6,1:6)));
                     So.dist_untrained = nanmean(rsa_vectorizeRDM(RDM(7:12,7:12)));
